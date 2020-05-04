@@ -1,0 +1,28 @@
+{
+  "name": "harjoitus",
+  "version": "1.0.0",
+  "description": "exercise 3",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KuikkaKoponen/ot-harjoitustyo2.git"
+  },
+  "author": "Ville",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KuikkaKoponen/ot-harjoitustyo2/issues"
+  },
+  "homepage": "https://github.com/KuikkaKoponen/ot-harjoitustyo2#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.3"
+  }
+}
