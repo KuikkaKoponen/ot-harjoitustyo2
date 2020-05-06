@@ -1,12 +1,14 @@
+require('dotenv').config() // hakee ympäristömuuttujat tiedosta
 const express = require('express')
 const app = express()
 const morgan = require('morgan')
 const cors = require('cors')
+const Note = require('./models/note')
 
-app.use(cors()) // Liittyy, että Front ja Back voi toimia eri porteista
-app.use(express.json()) 
+app.use(cors()) // liittyy, että Front ja Back voi toimia eri porteista
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :content'))  // tämä näyttää consoliin logeja
 app.use(express.static('build')) // tämä liittyy siihen, että käytetään staattista Fronttia. Back palauttaa Frontin build kansiosta kun mennään pääsivulle
+app.use(express.json()) 
 
 // tässä lisätää lokiin sisältö jos POST tai PUT pyyntö
 morgan.token('content', (request, response) => {
@@ -15,47 +17,38 @@ morgan.token('content', (request, response) => {
   }
 })
 
-let notes = [
-  {
-    id: 1,
-    name: "Kalle",
-    number: "0202020202"
-  },
-  {
-    id: 2,
-    name: "Ville",
-    number: "214123421341234"
-  },
-  {
-    id: 3,
-    name: "Nakki",
-    number: "34623623462467246"
+// toimii
+app.get('/api/persons', (request, response) => {
+  Note.find({}).then(notes => {
+    response.json(notes.map(note => note.toJSON()))
+  })
+})
 
-  }
-]
-
+// toimii
 app.get('/api/persons/:id', (request, response) => {
-    console.log("GET request")
-    const id = Number(request.params.id)  // muutetaan numero muotoon
-    console.log(id)
-    const note = notes.find(note => note.id === id)
+  Note.findById(request.params.id)
+    .then(note => {
+      if (note) {
+        response.json(note.toJSON())
+      } else {
+        response.status(404).end()
+      }
+    })
+    .catch(error => next(error))
+})
 
-    if (note) {
-      response.json(note)
-    } else {
-      response.status(404).end()
-    } 
-  })
-  
-  app.get('/info', (req, res) => {
-    const date = Date()
-    res.send(`<p>Phonebook has info for ${notes.length} people</p> </br> ${date}`)
-  })
-  
-  app.get('/api/persons', (req, res) => {
-    res.json(notes)
-  })
+// toimii
+app.get('/info', (req, res) => {
+  var size = 0
+  // luulisi, että löytyy koon kertova pyyntö
+  Note.find({}).then(notes => {
+    size = notes.length  
+  const date = Date()
+  res.send(`<p>Phonebook has info for ${size} people</p> </br> ${date}`)
+  })  
+})
 
+// toimii
 app.post('/api/persons', (request, response) => {
   const body = request.body
   console.log(body)
@@ -71,52 +64,63 @@ app.post('/api/persons', (request, response) => {
     })
   }
 
-  const nameUsed = notes.find(note => note.name == body.name)
-  if (nameUsed) {
-    return response.status(400).json({ 
-      error: 'name must be unique' 
-    })
-  }
-
-  const note = {
-    id: Math.floor(Math.random() * 500),
+  const note = new Note({
     name: body.name,
-    number: body.number || 0
-    
-  }
-
-  notes = notes.concat(note)
-
-  response.json(note)
-})
-
-app.put('/api/persons/:id', (request, response) => {
-  const body = request.body
-  const id = Number(request.params.id)
-  for (var i = 0; i < notes.length; i++) {
-    if (notes[i].id == id) {
-        notes[i].name = body.name
-        notes[i].number = body.number
-        console.log('Päivitetty')
-        return response.json(body)
-    }
-  }
-
-  return response.status(400).json({ 
-    error: 'Person not found' 
+    number: body.number
   })
 
-
+  note.save().then(savedNote => {
+    response.json(savedNote.toJSON())
+  })
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  notes = notes.filter(note => note.id !== id)
-  
-  response.status(204).end()
+// toimii
+app.put('/api/persons/:id', (request, response, next) => {
+  const body = request.body
+
+  const note = {
+    name: body.name,
+    number: body.number,
+  }
+
+  // huom! metodin findByIdAndUpdate parametrina tulee antaa normaali Javascript-olio
+  Note.findByIdAndUpdate(request.params.id, note, { new: true }) // true palauttaa päivitetyn olion (normisti vanha)
+    .then(updatedNote => {
+      response.json(updatedNote.toJSON())
+    })
+    .catch(error => next(error))
 })
 
-const PORT = process.env.PORT || 3001
+// toimii
+app.delete('/api/persons/:id', (request, response, next) => {
+  Note.findByIdAndRemove(request.params.id)
+    .then(result => {
+      response.status(204).end()
+    })
+    .catch(error => next(error))
+})
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
+// olemattomien osoitteiden käsittely middleware
+app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+
+  next(error)
+}
+
+// virheellisten pyyntöjen käsittely middleware
+app.use(errorHandler)
+
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
