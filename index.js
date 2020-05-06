@@ -6,7 +6,7 @@ const cors = require('cors')
 app.use(cors()) // Liittyy, että Front ja Back voi toimia eri porteista
 app.use(express.json()) 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :content'))  // tämä näyttää consoliin logeja
-app.use(express.static('build')) // tämä liittyy siihen, että käytetään staattista Fronttia
+app.use(express.static('build')) // tämä liittyy siihen, että käytetään staattista Fronttia. Back palauttaa Frontin build kansiosta kun mennään pääsivulle
 
 // tässä lisätää lokiin sisältö jos POST tai PUT pyyntö
 morgan.token('content', (request, response) => {
@@ -47,12 +47,6 @@ app.get('/api/persons/:id', (request, response) => {
     } 
   })
   
-  /*
-  app.get('/', (req, res) => {
-    res.send('<h1>Täältä voi hakea ihmisiä</h1>')
-  })
-  */
-
   app.get('/info', (req, res) => {
     const date = Date()
     res.send(`<p>Phonebook has info for ${notes.length} people</p> </br> ${date}`)
