@@ -15,8 +15,16 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
   })
 
 const noteSchema = new mongoose.Schema({
-  name: String,
-  number: String,
+  name: {
+    type: String,
+    minlength: 5,
+    required: true
+  },
+  number: { 
+    type: String,
+    minlength: 5,
+    required: true
+  }, 
 })
 
 // Tällä muokataan mongosta palaavaa notea, siitä otetaan _id ja __v pois. Id palautetaan sitten normaalissa muodossa
