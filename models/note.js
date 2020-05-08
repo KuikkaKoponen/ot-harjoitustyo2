@@ -2,6 +2,7 @@
 
 const mongoose = require('mongoose')
 mongoose.set('useFindAndModify', false) // tämä rooli jäi auki
+var uniqueValidator = require('mongoose-unique-validator')
 
 const url = process.env.MONGODB_URI // tämä saadaan .env kansiosta
 
@@ -17,15 +18,19 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
 const noteSchema = new mongoose.Schema({
   name: {
     type: String,
-    minlength: 5,
-    required: true
+    minlength: 3,
+    required: true,
+    unique: true 
   },
   number: { 
     type: String,
-    minlength: 5,
+    minlength: 8,
     required: true
   }, 
 })
+
+/// KORJAA
+noteSchema.plugin(uniqueValidator)
 
 // Tällä muokataan mongosta palaavaa notea, siitä otetaan _id ja __v pois. Id palautetaan sitten normaalissa muodossa
 noteSchema.set('toJSON', {
