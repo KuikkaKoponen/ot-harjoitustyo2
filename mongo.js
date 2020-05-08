@@ -1,3 +1,4 @@
+/// tämä ei käytössä, vanha paikallinen versio
 
 const mongoose = require('mongoose')
 

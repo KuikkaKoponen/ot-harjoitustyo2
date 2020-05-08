@@ -42,10 +42,10 @@ app.get('/info', (req, res) => {
   var size = 0
   // luulisi, että löytyy koon kertova pyyntö
   Note.find({}).then(notes => {
-    size = notes.length  
-  const date = Date()
-  res.send(`<p>Phonebook has info for ${size} people</p> </br> ${date}`)
-  })  
+    size = notes.length
+    const date = Date()
+    res.send(`<p>Phonebook has info for ${size} people</p> </br> ${date}`)
+  })
 })
 
 // toimii
@@ -60,12 +60,12 @@ app.post('/api/persons', (request, response, next) => {
 
   // alla hienosti ketjutetaan formaatit oikeaan muotoon
   note
-  .save()
-  .then(savedNote => savedNote.toJSON())
-  .then(savedAndFormattedNote => {
-    response.json(savedAndFormattedNote)
-  }) 
-  .catch(error => next(error))
+    .save()
+    .then(savedNote => savedNote.toJSON())
+    .then(savedAndFormattedNote => {
+      response.json(savedAndFormattedNote)
+    })
+    .catch(error => next(error))
 })
 
 // toimii
@@ -108,7 +108,7 @@ const errorHandler = (error, request, response, next) => {
     return response.status(400).send({ error: 'malformatted id' })
   } else if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message })
-  } 
+  }
   next(error)
 }
 

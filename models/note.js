@@ -20,13 +20,13 @@ const noteSchema = new mongoose.Schema({
     type: String,
     minlength: 3,
     required: true,
-    unique: true 
+    unique: true
   },
-  number: { 
+  number: {
     type: String,
     minlength: 8,
     required: true
-  }, 
+  },
 })
 
 /// KORJAA
