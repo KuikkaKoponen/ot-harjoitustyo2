@@ -1,14 +1,14 @@
 require('dotenv').config() // hakee ympäristömuuttujat tiedosta
 const express = require('express')
-const app = express()
-const morgan = require('morgan')
-const cors = require('cors')
-const Note = require('./models/note')
+const app = express() // web framework for Node.js
+const morgan = require('morgan') // tällä pystyi tekemään automaattiprinttauksia terminaaliin
+const cors = require('cors') // liittyy, että Front ja Back voi toimia eri porteista
+const Note = require('./models/note') // Tietokantaan yhdeydenottaminen ja skeeman tekeminen
 
-app.use(cors()) // liittyy, että Front ja Back voi toimia eri porteista
+app.use(cors())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :content'))  // tämä näyttää consoliin logeja
 app.use(express.static('build')) // tämä liittyy siihen, että käytetään staattista Fronttia. Back palauttaa Frontin build kansiosta kun mennään pääsivulle
-app.use(express.json()) 
+app.use(express.json())
 
 // tässä lisätää lokiin sisältö jos POST tai PUT pyyntö
 morgan.token('content', (request, response) => {

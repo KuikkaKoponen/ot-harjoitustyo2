@@ -2,7 +2,7 @@
 
 const mongoose = require('mongoose')
 mongoose.set('useFindAndModify', false) // tämä rooli jäi auki
-var uniqueValidator = require('mongoose-unique-validator')
+var uniqueValidator = require('mongoose-unique-validator') // ei saa olla kahta samaa
 
 const url = process.env.MONGODB_URI // tämä saadaan .env kansiosta
 
